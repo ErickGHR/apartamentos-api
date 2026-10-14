@@ -1,0 +1,90 @@
+{
+  "info": {
+    "name": "Apartamentos API",
+    "description": "Peticiones en el orden necesario para registrar una propiedad y una reservación.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "ownerId", "value": "1" },
+    { "key": "clientId", "value": "2" },
+    { "key": "propertyId", "value": "1" },
+    { "key": "unitId", "value": "1" },
+    { "key": "reservationId", "value": "1" },
+    { "key": "paymentId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "1. Registrar propietario",
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Propietario registrado', () => pm.expect(pm.response.code).to.eql(201));", "if (pm.response.code === 201) pm.collectionVariables.set('ownerId', pm.response.json().id);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"tipo\": \"PROPIETARIO\",\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"López\",\n  \"email\": \"ana{{$timestamp}}@example.com\",\n  \"telefono\": \"8112345678\",\n  \"fechaNacimiento\": \"1990-06-15\",\n  \"ine\": \"INE-P-{{$timestamp}}\",\n  \"direccion\": \"Calle Hidalgo 100\",\n  \"password\": \"Temporal123\"\n}" },
+        "url": "{{baseUrl}}/api/clientes"
+      }
+    },
+    {
+      "name": "2. Registrar huésped",
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Huésped registrado', () => pm.expect(pm.response.code).to.eql(201));", "if (pm.response.code === 201) pm.collectionVariables.set('clientId', pm.response.json().id);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"tipo\": \"CLIENTE\",\n  \"nombres\": \"Luis\",\n  \"apellidos\": \"Martínez\",\n  \"email\": \"luis{{$timestamp}}@example.com\",\n  \"telefono\": \"8111112233\",\n  \"fechaNacimiento\": \"1998-02-20\",\n  \"ine\": \"INE-C-{{$timestamp}}\",\n  \"direccion\": \"Calle Juárez 80\",\n  \"password\": \"Temporal123\"\n}" },
+        "url": "{{baseUrl}}/api/clientes"
+      }
+    },
+    {
+      "name": "3. Registrar propiedad",
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Propiedad registrada', () => pm.expect(pm.response.code).to.eql(201));", "if (pm.response.code === 201) pm.collectionVariables.set('propertyId', pm.response.json().idPropiedad);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"propietario\": { \"id\": {{ownerId}} },\n  \"tipo\": \"APARTAMENTO\",\n  \"titulo\": \"Departamento en el centro\",\n  \"descripcion\": \"Departamento cómodo y cercano a los servicios principales.\",\n  \"direccion\": \"Avenida Constitución 500\",\n  \"ciudad\": \"Monterrey\",\n  \"estadoFederativo\": \"Nuevo León\",\n  \"codigoPostal\": \"64000\",\n  \"pais\": \"México\",\n  \"latitud\": 25.6866,\n  \"longitud\": -100.3161,\n  \"precioNoche\": 1200.00,\n  \"capacidad\": 4,\n  \"numHabitaciones\": 2,\n  \"numBanos\": 1,\n  \"metrosCuadrados\": 75,\n  \"comodidades\": \"WiFi, cocina y estacionamiento\",\n  \"reglas\": \"No fumar\",\n  \"estado\": \"DISPONIBLE\"\n}" },
+        "url": "{{baseUrl}}/api/propiedades"
+      }
+    },
+    {
+      "name": "4. Registrar unidad",
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Unidad registrada', () => pm.expect(pm.response.code).to.eql(201));", "if (pm.response.code === 201) pm.collectionVariables.set('unitId', pm.response.json().idUnidad);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"propiedad\": { \"idPropiedad\": {{propertyId}} },\n  \"nombre\": \"Apartamento 1A\",\n  \"tipo\": \"COMPLETO\",\n  \"capacidad\": 4,\n  \"precioNoche\": 1200.00,\n  \"estado\": \"DISPONIBLE\"\n}" },
+        "url": "{{baseUrl}}/api/unidades"
+      }
+    },
+    {
+      "name": "5. Crear reservación",
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Reservación creada', () => pm.expect(pm.response.code).to.eql(201));", "if (pm.response.code === 201) pm.collectionVariables.set('reservationId', pm.response.json().idReservacion);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"unidad\": { \"idUnidad\": {{unitId}} },\n  \"cliente\": { \"id\": {{clientId}} },\n  \"fechaEntrada\": \"2026-11-10T15:00:00\",\n  \"fechaSalida\": \"2026-11-13T11:00:00\",\n  \"importeTotal\": 3600.00,\n  \"estado\": \"PENDIENTE\",\n  \"comentario\": \"Llegada aproximada a las cinco de la tarde\"\n}" },
+        "url": "{{baseUrl}}/api/reservas"
+      }
+    },
+    {
+      "name": "6. Registrar pago",
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Pago registrado', () => pm.expect(pm.response.code).to.eql(201));", "if (pm.response.code === 201) pm.collectionVariables.set('paymentId', pm.response.json().idPago);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"reserva\": { \"idReservacion\": {{reservationId}} },\n  \"importe\": 3600.00,\n  \"fechaVencimiento\": \"2026-11-05\",\n  \"metodo\": \"TRANSFERENCIA\",\n  \"estado\": \"PENDIENTE\"\n}" },
+        "url": "{{baseUrl}}/api/pagos"
+      }
+    },
+    {
+      "name": "7. Consultar propiedades por tipo",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/propiedades/tipo/APARTAMENTO" }
+    },
+    {
+      "name": "8. Consultar propiedades por propietario",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/propiedades/propietario/{{ownerId}}" }
+    },
+    {
+      "name": "9. Consultar reservaciones",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/reservas" }
+    }
+  ]
+}

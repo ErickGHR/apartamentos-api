@@ -3,7 +3,7 @@ package com.api.apartamentos.models;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,7 +51,7 @@ public class ClienteModel {
     @Enumerated(EnumType.STRING)
     @Column(name = "estatus", nullable = false, length = 15)
     private ClienteStatus estatus = ClienteStatus.ACTIVO;
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", nullable = false, length = 255)
     @NotBlank
     private String password;
